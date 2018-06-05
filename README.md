@@ -11,8 +11,10 @@ Service to create, update, and delete the jobs in TM
                                                                             v2.0
 
 How to run locally -> 
+    $ npm install
     $ npm start
 
 How to run on production server -> 
+    $ npm install
     $ npm install -g forever
     $ forever start main
