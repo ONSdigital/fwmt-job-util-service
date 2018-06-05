@@ -1,0 +1,128 @@
+<html>
+
+<head>
+    <title>FWMT Gateway Debugger</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel="icon" href="https://pbs.twimg.com/profile_images/875672973054808064/IdvzYE0b.jpg" type="image/x-icon" />
+</head>
+
+<body>
+
+    <style>
+        #dangeralert {
+            display: none
+        }
+
+        #successalert {
+            display: none
+        }
+    </style>
+
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #003d59">
+        <a class="navbar-brand" href="#">FWMT Gateway Debugger</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-nav">
+            <a class="nav-item nav-link" href="/">New Job</a>
+            <a class="nav-item nav-link" href="/reallocate">Reallocate Job</a>
+            <a class="nav-item nav-link active" href="/delete">Delete Job
+                <span class="sr-only">(current)</span>
+            </a>
+            <small>
+                <a class="nav-item nav-link disabled">Emporium v2.0</a>
+            </small>
+        </div>
+    </nav>
+
+    <main role="main" class="container" style="text-align: center;">
+        <h1 class="mt-5">Delete some jobs!</h1>
+        <div class="alert alert-danger" role="alert" id="dangeralert"></div>
+        <div class="alert alert-success" role="alert" id="successalert"></div>
+        <p class="lead">
+            <div style="background-color: #f9f9f9; padding:10px 20px; border-radius: 30px;">
+                <form action="/" method="post">
+                    <label>Totalmobile server information</label>
+                    </br>
+
+                    <div class="input-group mb-3">
+
+                        <div class="input-group-prepend">
+                            <select class="custom-select" id="isSecure">
+                                <option value="false">http://</option>
+                                <option value="true" selected>https://</option>
+                            </select>
+                        </div>
+                        <input type="text" class="form-control" placeholder="e.g. ons-dev.totalmobile-clown.com" id="server">
+                        <div class="input-group-append">
+                            <select class="custom-select" id="instance" style="width: 100px;">
+                                <option value="Dev" selected>/Dev</option>
+                                <option value="Test">/Test</option>
+                                <option value="Live">/Live</option>
+                            </select>
+                            <span class="input-group-text" id="">/services/tm/v20/messaging/MessageQueueWs.asmx</span>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Username" id="authusername">
+                        <input type="password" class="form-control" placeholder="Password" id="authpassword">
+                    </div>
+
+                    <div style="background-color: aliceblue; padding:10px 20px; border-radius: 30px;">
+                        <label>List of TMJobIds (separated with commas)</label>
+                        <input type="text" class="form-control" placeholder="Totalmobile Jobs" id="tmjobids">
+                        </br>
+
+                        <button type="button" class="btn btn-primary" id="submitButton">Delete jobs</button>
+                    </div>
+                </form>
+            </div>
+        </p>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <script>
+        $('#submitButton').click(function () {
+            $('#successalert').css("display", "none")
+            $('#submitButton').attr("disabled", "disabled");
+            let isSecure = (($('#isSecure').val() == 'true') ? true : false)
+            let serverURL = $('#server').val()
+            let instance = $('#instance').val()
+            let authUsername = $('#authusername').val()
+            let authPassword = $('#authpassword').val()
+            let tmJobIds = $('#tmjobids').val()
+
+            if (isSecure != '' && serverURL != '' && instance != '' && authUsername != '' && authPassword != '' && tmJobIds != '') {
+                $('#dangeralert').css("display", "none")
+                $('#authpassword').val('')
+                $.post('/delete', {
+                    isSecure: isSecure,
+                    serverURL: serverURL,
+                    instance: instance,
+                    authUsername: authUsername,
+                    authPassword: authPassword,
+                    tmJobIds: tmJobIds
+                }, (data) => {
+                    $('#successalert').css("display", "block")
+                    $('#successalert').html('Successfully deleted!')
+                })
+                $('#submitButton').removeAttr("disabled");
+            } else {
+                $('#dangeralert').css("display", "block")
+                $('#dangeralert').html('You have not completed some fields, please try again!')
+                $('#submitButton').removeAttr("disabled");
+            }
+        })
+    </script>
+
+</body>
+
+</html>
