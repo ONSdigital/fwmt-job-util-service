@@ -94,12 +94,14 @@ let handler = {
                         tmJobIdStub = 'Census-O%QUOTA%'
                         dueDate = '2018-07-31T23:59:59'
                         tla = 'Census'
+                        // additionalProperties = additionalProperties + '<ns5:AdditionalProperty><ns5:Name>Serno</ns5:Name><ns5:Value>Serno</ns5:Value></ns5:AdditionalProperty>'
                         break;
                     case 'CCS':
                         workType = 'CCS'
                         tmJobIdStub = 'Census-O%QUOTA%'
                         dueDate = '2018-07-31T23:59:59'
                         tla = 'CCS'
+                        // additionalProperties = additionalProperties + '<ns5:AdditionalProperty><ns5:Name>Serno</ns5:Name><ns5:Value>Serno</ns5:Value></ns5:AdditionalProperty>'
                         break;
                     default:
                         console.log('Invalid job type was selected!')
@@ -140,8 +142,8 @@ let handler = {
 
                 for (var c = 0; c < tmUNames.length; c++) {
                     tmUNames[c] = tmUNames[c].trim()
-                    addresses.addresses.forEach((address, i) => {
-                        if (i < numberOfJobs) {
+                    // addresses.addresses.forEach((address, i) => {
+                    for(let i=0;i<numberOfJobs;i++){
                             let createJobRequest = createJobRequestTemplate
                             let tmJobId = tmJobIdStub.replace(/%QUOTA%/g, leftPad(currentId, 5, 0))
                             currentId++
@@ -172,7 +174,7 @@ let handler = {
 
                             let auth = 'Basic ' + new Buffer(tmUsername + ':' + tmPassword).toString('base64')
 
-                            request({
+                            await request({
                                 headers: {
                                     'SOAPAction': 'http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/SendCreateJobRequestMessage',
                                     'Content-Type': 'text/xml',
@@ -185,8 +187,7 @@ let handler = {
                                 successfulIds.push(tmJobId)
                                 console.log(body)
                             });
-                        }
-                    })
+                    }
                 }
                 // UPDATE CURRENT COUNTER
                 fs.writeFileSync('id-counter.json', JSON.stringify({
@@ -292,3 +293,8 @@ let handler = {
 }
 
 module.exports = handler
+
+async function lel(){
+    console.log(await handler.newJobs('CCS', 'james.berry', 1, 'Mid', 'MAN', 'ons-dev.totalmobile-cloud.com', 'Test', true, 'james.berry', 'Pass!123'))
+}
+lel()
