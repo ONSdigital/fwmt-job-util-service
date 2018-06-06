@@ -35,6 +35,6 @@ app.post('/delete', async (req, res) => {
     res.send(await handler.deletions(req.body.tmJobIds, req.body.serverURL, req.body.instance, req.body.isSecure, req.body.authUsername, req.body.authPassword))
 })
 
-app.listen(3000, () => {
+app.listen(8080, () => {
     console.log('FWMT Message Sender Started on port 3000')
 })
