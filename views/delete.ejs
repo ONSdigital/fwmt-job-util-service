@@ -111,8 +111,14 @@
                     authPassword: authPassword,
                     tmJobIds: tmJobIds
                 }, (data) => {
-                    $('#successalert').css("display", "block")
-                    $('#successalert').html('Successfully deleted!')
+                    console.log(data)
+                    if(data == 'Error'){
+                        $('#dangeralert').css("display", "block")
+                        $('#dangeralert').html('Totalmobile server details and/or authentication is incorrect.')
+                    } else {
+                        $('#successalert').css("display", "block")
+                        $('#successalert').html('Successfully deleted!')
+                    }
                 })
                 $('#submitButton').removeAttr("disabled");
             } else {

@@ -13,6 +13,7 @@
         #dangeralert {
             display: none
         }
+
         #successalert {
             display: none
         }
@@ -132,7 +133,7 @@
             let locality = $('#locality').val()
 
             console.log(numberOfJobs)
-            if(isNaN(numberOfJobs)||numberOfJobs<1||numberOfJobs>100){
+            if (isNaN(numberOfJobs) || numberOfJobs < 1 || numberOfJobs > 100) {
                 $('#dangeralert').css("display", "block")
                 $('#dangeralert').html('You have entered an invalid number of jobs!')
                 $('#submitButton').removeAttr("disabled");
@@ -155,12 +156,18 @@
                     numberOfJobs: numberOfJobs,
                     locality: locality
                 }, (data) => {
-                    $('#successalert').css("display", "block")
-                    let allJobIds = ''
-                    for(let i=0;i<data.length;i++){
-                        allJobIds = allJobIds + data[i] + '</br>'
-                    }                        
-                    $('#successalert').html('Successfully created '+numberOfJobs+' jobs!')
+                    if (data == 'Error') {
+                        $('#dangeralert').css("display", "block")
+                        $('#dangeralert').html('Totalmobile server details and/or authentication is incorrect.')
+                    } else {
+                        $('#successalert').css("display", "block")
+                        let allJobIds = ''
+                        for (let i = 0; i < data.length; i++) {
+                            allJobIds = allJobIds + data[i] + '</br>'
+                        }
+                        $('#successalert').html('Successfully created ' + numberOfJobs +
+                            ' jobs with TMJobIds:</br>' + allJobIds)
+                    }
                 })
                 $('#submitButton').removeAttr("disabled");
             } else {
