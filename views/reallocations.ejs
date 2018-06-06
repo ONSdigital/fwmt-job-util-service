@@ -117,8 +117,13 @@
                     tmJobIds: tmJobIds,
                     allocatedUsername: allocatedUsername
                 }, (data) => {
-                    $('#successalert').css("display", "block")
-                    $('#successalert').html('Successfully reallocated!')
+                    if(data == 'Error'){
+                        $('#dangeralert').css("display", "block")
+                        $('#dangeralert').html('Totalmobile server details and/or authentication is incorrect.')
+                    } else {
+                        $('#successalert').css("display", "block")
+                        $('#successalert').html('Successfully reallocated!')
+                    }
                 })
                 $('#submitButton').removeAttr("disabled");
             } else {

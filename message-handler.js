@@ -7,8 +7,8 @@ const deleteJobRequestFile = './messages/DeleteJobRequest.txt'
 
 let handler = {
     newJobs: async function (jobType, tmUsernames, numberOfJobs, areaForJobs, world, tmServer, tmInstance, tmSecure, tmUsername, tmPassword) {
-        return await new Promise((res, rej) => {
-            fs.readFile(createJobRequestFile, function (err, data) {
+        return await new Promise((resolve, rej) => {
+            fs.readFile(createJobRequestFile, async function (err, data) {
                 const id = require('./id-counter.json')
                 if (err) throw err;
                 let createJobRequestTemplate = data.toString()
@@ -94,12 +94,14 @@ let handler = {
                         tmJobIdStub = 'Census-O%QUOTA%'
                         dueDate = '2018-07-31T23:59:59'
                         tla = 'Census'
+                        // additionalProperties = additionalProperties + '<ns5:AdditionalProperty><ns5:Name>Serno</ns5:Name><ns5:Value>Serno</ns5:Value></ns5:AdditionalProperty>'
                         break;
                     case 'CCS':
                         workType = 'CCS'
                         tmJobIdStub = 'Census-O%QUOTA%'
                         dueDate = '2018-07-31T23:59:59'
                         tla = 'CCS'
+                        // additionalProperties = additionalProperties + '<ns5:AdditionalProperty><ns5:Name>Serno</ns5:Name><ns5:Value>Serno</ns5:Value></ns5:AdditionalProperty>'
                         break;
                     default:
                         console.log('Invalid job type was selected!')
@@ -140,66 +142,72 @@ let handler = {
 
                 for (var c = 0; c < tmUNames.length; c++) {
                     tmUNames[c] = tmUNames[c].trim()
-                    addresses.addresses.forEach((address, i) => {
-                        if (i < numberOfJobs) {
-                            let createJobRequest = createJobRequestTemplate
-                            let tmJobId = tmJobIdStub.replace(/%QUOTA%/g, leftPad(currentId, 5, 0))
-                            currentId++
-                            let addressLines = ''
+                    // addresses.addresses.forEach((address, i) => {
+                    for (let i = 0; i < numberOfJobs; i++) {
+                        let createJobRequest = createJobRequestTemplate
+                        let tmJobId = tmJobIdStub.replace(/%QUOTA%/g, leftPad(currentId, 5, 0))
+                        currentId++
+                        let addressLines = ''
 
-                            if (address.line1) {
-                                addressLines = addressLines + '<ns3:AddressLine>' + address.line1 + '</ns3:AddressLine>'
-                                if (address.line2) {
-                                    addressLines = addressLines + '<ns3:AddressLine>' + address.line2 + '</ns3:AddressLine>'
-                                    if (address.line3) {
-                                        addressLines = addressLines + '<ns3:AddressLine>' + address.line3 + '</ns3:AddressLine>'
-                                        if (address.line4) {
-                                            addressLines = addressLines + '<ns3:AddressLine>' + address.line4 + '</ns3:AddressLine>'
-                                        }
+                        if (addresses.addresses[i].line1) {
+                            addressLines = addressLines + '<ns3:AddressLine>' + addresses.addresses[i].line1 + '</ns3:AddressLine>'
+                            if (addresses.addresses[i].line2) {
+                                addressLines = addressLines + '<ns3:AddressLine>' + addresses.addresses[i].line2 + '</ns3:AddressLine>'
+                                if (addresses.addresses[i].line3) {
+                                    addressLines = addressLines + '<ns3:AddressLine>' + addresses.addresses[i].line3 + '</ns3:AddressLine>'
+                                    if (addresses.addresses[i].line4) {
+                                        addressLines = addressLines + '<ns3:AddressLine>' + addresses.addresses[i].line4 + '</ns3:AddressLine>'
                                     }
                                 }
                             }
-
-                            createJobRequest = createJobRequest.replace(/%%TLA%%/g, tla)
-                            createJobRequest = createJobRequest.replace(/%%DUEDATE%%/g, dueDate)
-                            createJobRequest = createJobRequest.replace(/%%REFERENCE%%/g, tmJobId)
-                            createJobRequest = createJobRequest.replace(/%%ADDRESS%%/g, addressLines)
-                            createJobRequest = createJobRequest.replace(/%%POSTCODE%%/g, address.postcode)
-                            createJobRequest = createJobRequest.replace(/%%WORKTYPE%%/g, workType)
-                            createJobRequest = createJobRequest.replace(/%%USERNAME%%/g, tmUNames[c])
-                            createJobRequest = createJobRequest.replace(/%%ADDITIONAL%%/g, additionalProperties)
-                            createJobRequest = createJobRequest.replace(/%%WORLD%%/g, worldReference)
-
-                            let auth = 'Basic ' + new Buffer(tmUsername + ':' + tmPassword).toString('base64')
-
-                            request({
-                                headers: {
-                                    'SOAPAction': 'http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/SendCreateJobRequestMessage',
-                                    'Content-Type': 'text/xml',
-                                    'Authorization': auth
-                                },
-                                uri: tmPostURL,
-                                body: createJobRequest,
-                                method: 'POST'
-                            }, function (err, res, body) {
-                                successfulIds.push(tmJobId)
-                                console.log(body)
-                            });
                         }
-                    })
+
+                        createJobRequest = createJobRequest.replace(/%%TLA%%/g, tla)
+                        createJobRequest = createJobRequest.replace(/%%DUEDATE%%/g, dueDate)
+                        createJobRequest = createJobRequest.replace(/%%REFERENCE%%/g, tmJobId)
+                        createJobRequest = createJobRequest.replace(/%%ADDRESS%%/g, addressLines)
+                        createJobRequest = createJobRequest.replace(/%%POSTCODE%%/g, addresses.addresses[i].postcode)
+                        createJobRequest = createJobRequest.replace(/%%WORKTYPE%%/g, workType)
+                        createJobRequest = createJobRequest.replace(/%%USERNAME%%/g, tmUNames[c])
+                        createJobRequest = createJobRequest.replace(/%%ADDITIONAL%%/g, additionalProperties)
+                        createJobRequest = createJobRequest.replace(/%%WORLD%%/g, worldReference)
+
+                        let auth = 'Basic ' + new Buffer(tmUsername + ':' + tmPassword).toString('base64')
+
+                        await request({
+                            headers: {
+                                'SOAPAction': 'http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/SendCreateJobRequestMessage',
+                                'Content-Type': 'text/xml',
+                                'Authorization': auth
+                            },
+                            uri: tmPostURL,
+                            body: createJobRequest,
+                            method: 'POST'
+                        }, function (err, res, body) {
+                            successfulIds.push(tmJobId)
+                            console.log(body)
+                            if(!body||body.indexOf('SendMessageResponse')==-1){
+                                fs.writeFileSync('id-counter.json', JSON.stringify({
+                                    "count": currentId
+                                }))
+                                resolve('Error')
+                            }
+                            if(i==numberOfJobs-1){
+                                fs.writeFileSync('id-counter.json', JSON.stringify({
+                                    "count": currentId
+                                }))
+                                console.log(successfulIds)
+                                resolve(successfulIds)
+                            }
+                        });
+                    }
                 }
-                // UPDATE CURRENT COUNTER
-                fs.writeFileSync('id-counter.json', JSON.stringify({
-                    "count": currentId
-                }))
-                // console.log(successfulIds)
-                res(successfulIds)
             })
         })
     },
     reallocations: async function (tmJobIds, allocatedTo, tmServer, tmInstance, tmSecure, tmUsername, tmPassword) {
-        return await new Promise((res, rej) => {
-            fs.readFile(updateJobHeaderRequestFile, function (err, data) {
+        return await new Promise((resolve, rej) => {
+            fs.readFile(updateJobHeaderRequestFile, async function (err, data) {
                 if (err) throw err;
 
                 let tmPostURL
@@ -218,6 +226,7 @@ let handler = {
                     tmJIds.push(tmJobIds)
                 }
 
+                let counter = 0
                 for (var c = 0; c < tmJIds.length; c++) {
                     tmJIds[c] = tmJIds[c].trim()
                     let updateJobHeaderRequest = updateJobHeaderRequestTemplate
@@ -227,7 +236,7 @@ let handler = {
 
                     let auth = 'Basic ' + new Buffer(tmUsername + ':' + tmPassword).toString('base64')
 
-                    request({
+                    await request({
                         headers: {
                             'SOAPAction': 'http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/SendUpdateJobHeaderRequestMessage',
                             'Content-Type': 'text/xml',
@@ -238,15 +247,23 @@ let handler = {
                         method: 'POST'
                     }, function (err, res, body) {
                         console.log(body)
+                        if(!body||body.indexOf('SendMessageResponse')==-1){
+                            console.log('Reallocation Error')
+                            resolve('Error')
+                        }
+                        counter++
+                        if(counter==tmJIds.length){
+                            console.log('Reallocation Success')
+                            resolve('Success')
+                        }
                     });
                 }
-                res('finished')
             })
         })
     },
     deletions: async function (tmJobIds, tmServer, tmInstance, tmSecure, tmUsername, tmPassword) {
-        return await new Promise((res, rej) => {
-            fs.readFile(deleteJobRequestFile, function (err, data) {
+        return await new Promise((resolve, rej) => {
+            fs.readFile(deleteJobRequestFile, async function (err, data) {
                 if (err) throw err;
 
                 let tmPostURL
@@ -264,6 +281,7 @@ let handler = {
                     tmJIds.push(tmJobIds)
                 }
 
+                let counter = 0;
                 for (var c = 0; c < tmJIds.length; c++) {
                     tmJIds[c] = tmJIds[c].trim()
                     let deleteJobRequest = deleteJobRequestTemplate
@@ -272,7 +290,7 @@ let handler = {
 
                     let auth = 'Basic ' + new Buffer(tmUsername + ':' + tmPassword).toString('base64')
 
-                    request({
+                    await request({
                         headers: {
                             'SOAPAction': 'http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/SendDeleteJobRequestMessage',
                             'Content-Type': 'text/xml',
@@ -283,9 +301,17 @@ let handler = {
                         method: 'POST'
                     }, function (err, res, body) {
                         console.log(body)
+                        if(!body||body.indexOf('SendMessageResponse')==-1){
+                            console.log('Deletion Error')
+                            resolve('Error')
+                        }
+                        counter++
+                        if(counter==tmJIds.length){
+                            console.log('Deletion Success')
+                            resolve('Success')
+                        }
                     });
                 }
-                res('finished')
             })
         })
     }

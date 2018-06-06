@@ -24,18 +24,15 @@ app.get('/delete', (req, res) => {
 })
 
 app.post('/', async (req, res) => {
-    let ids = await handler.newJobs(req.body.workType, req.body.tmUsernames, req.body.numberOfJobs, req.body.locality, req.body.world, req.body.serverURL, req.body.instance, req.body.isSecure, req.body.authUsername, req.body.authPassword)
-    res.send(ids)
+    res.send(await handler.newJobs(req.body.workType, req.body.tmUsernames, req.body.numberOfJobs, req.body.locality, req.body.world, req.body.serverURL, req.body.instance, req.body.isSecure, req.body.authUsername, req.body.authPassword))
 })
 
 app.post('/reallocate', async (req, res) => {
-    let ids = await handler.reallocations(req.body.tmJobIds, req.body.allocatedUsername, req.body.serverURL, req.body.instance, req.body.isSecure, req.body.authUsername, req.body.authPassword)
-    res.send(ids)
+    res.send(await handler.reallocations(req.body.tmJobIds, req.body.allocatedUsername, req.body.serverURL, req.body.instance, req.body.isSecure, req.body.authUsername, req.body.authPassword))
 })
 
 app.post('/delete', async (req, res) => {
-    let ids = await handler.deletions(req.body.tmJobIds, req.body.serverURL, req.body.instance, req.body.isSecure, req.body.authUsername, req.body.authPassword)
-    res.send(ids)
+    res.send(await handler.deletions(req.body.tmJobIds, req.body.serverURL, req.body.instance, req.body.isSecure, req.body.authUsername, req.body.authPassword))
 })
 
 app.listen(3000, () => {
