@@ -215,7 +215,7 @@ let handler = {
                                         resolve('Error')
                                     })
                                 }
-                                if (i == numberOfJobs - 1) {
+                                if (i == numberOfJobs - 1 && c == tmUNames.length-1) {
                                     await db.collection('idcounter').updateOne({
                                         id: 'counter'
                                     }, {
