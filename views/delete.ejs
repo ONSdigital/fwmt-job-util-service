@@ -65,10 +65,8 @@
                         <div class="input-group-append">
                             <select class="custom-select" id="instance" style="width: 100px;">
                                 <% Object.keys(instances).forEach(function(key) { %>
-                                    <option value="<%= instances[key] %>">/
-                                        <%= instances[key] %>
-                                    </option>
-                                    <% }); %>
+                                    <option value="<%= instances[key] %>">/<%= instances[key] %></option>
+                                <% }); %>
                             </select>
                             <span class="input-group-text" id="">/services/tm/v20/messaging/MessageQueueWs.asmx</span>
                         </div>
