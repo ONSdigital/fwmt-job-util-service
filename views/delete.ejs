@@ -55,12 +55,20 @@
                                 <option value="true" selected>https://</option>
                             </select>
                         </div>
-                        <input type="text" class="form-control" placeholder="e.g. ons-dev.totalmobile-clown.com" id="server">
+                        <select class="custom-select" id="server">
+                            <% Object.keys(environments).forEach(function(key) { %>
+                                <option value="<%= environments[key] %>">
+                                    <%= environments[key] %>
+                                </option>
+                                <% }); %>
+                        </select>
                         <div class="input-group-append">
                             <select class="custom-select" id="instance" style="width: 100px;">
-                                <option value="Dev" selected>/Dev</option>
-                                <option value="Test">/Test</option>
-                                <option value="Live">/Live</option>
+                                <% Object.keys(instances).forEach(function(key) { %>
+                                    <option value="<%= instances[key] %>">/
+                                        <%= instances[key] %>
+                                    </option>
+                                    <% }); %>
                             </select>
                             <span class="input-group-text" id="">/services/tm/v20/messaging/MessageQueueWs.asmx</span>
                         </div>
@@ -100,7 +108,8 @@
             let authPassword = $('#authpassword').val()
             let tmJobIds = $('#tmjobids').val()
 
-            if (isSecure != '' && serverURL != '' && instance != '' && authUsername != '' && authPassword != '' && tmJobIds != '') {
+            if (isSecure != '' && serverURL != '' && instance != '' && authUsername != '' && authPassword != '' &&
+                tmJobIds != '') {
                 $('#dangeralert').css("display", "none")
                 $('#authpassword').val('')
                 $.post('/delete', {
@@ -112,9 +121,10 @@
                     tmJobIds: tmJobIds
                 }, (data) => {
                     console.log(data)
-                    if(data == 'Error'){
+                    if (data == 'Error') {
                         $('#dangeralert').css("display", "block")
-                        $('#dangeralert').html('Totalmobile server details and/or authentication is incorrect.')
+                        $('#dangeralert').html(
+                            'Totalmobile server details and/or authentication is incorrect.')
                     } else {
                         $('#successalert').css("display", "block")
                         $('#successalert').html('Successfully deleted!')
