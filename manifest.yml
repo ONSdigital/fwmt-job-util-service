@@ -1,0 +1,8 @@
+---
+applications:
+- name: fwmt-gateway-job-utils
+  buildpack: nodejs_buildpack
+  command: npm start
+  memory: 512M
+  disk_quota: 512M
+  host: fwmt-gateway-job-utils
