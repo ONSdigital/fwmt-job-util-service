@@ -29,8 +29,8 @@
             <a class="nav-item nav-link active" href="/">New Job
                 <span class="sr-only">(current)</span>
             </a>
-            <a class="nav-item nav-link" href="/reallocate">Reallocate Job</a>
-            <a class="nav-item nav-link" href="/delete">Delete Job</a>
+            <a class="nav-item nav-link disabled">Reallocate Job</a>
+            <a class="nav-item nav-link disabled">Delete Job</a>
             <small>
                 <a class="nav-item nav-link disabled">Emporium v2.0</a>
             </small>
@@ -55,12 +55,16 @@
                                 <option value="true" selected>https://</option>
                             </select>
                         </div>
-                        <input type="text" class="form-control" placeholder="e.g. ons-dev.totalmobile-clown.com" id="server">
+                        <select class="custom-select" id="server">
+                            <% Object.keys(environments).forEach(function(key) { %>
+                                <option value="<%= environments[key] %>"><%= environments[key] %></option>
+                            <% }); %>
+                        </select>
                         <div class="input-group-append">
                             <select class="custom-select" id="instance" style="width: 100px;">
-                                <option value="Dev" selected>/Dev</option>
-                                <option value="Test">/Test</option>
-                                <option value="Live">/Live</option>
+                                <% Object.keys(instances).forEach(function(key) { %>
+                                    <option value="<%= instances[key] %>">/<%= instances[key] %></option>
+                                <% }); %>
                             </select>
                             <span class="input-group-text" id="">/services/tm/v20/messaging/MessageQueueWs.asmx</span>
                         </div>
@@ -161,12 +165,11 @@
                         $('#dangeralert').html('Totalmobile server details and/or authentication is incorrect.')
                     } else {
                         $('#successalert').css("display", "block")
-                        let allJobIds = ''
-                        for (let i = 0; i < data.length; i++) {
-                            allJobIds = allJobIds + data[i] + '</br>'
-                        }
-                        $('#successalert').html('Successfully created ' + numberOfJobs +
-                            ' jobs with TMJobIds:</br>' + allJobIds)
+                        // let allJobIds = ''
+                        // for (let i = 0; i < data.length; i++) {
+                        //     allJobIds = allJobIds + data[i] + '</br>'
+                        // }
+                        $('#successalert').html('Successfully created ' + numberOfJobs + ' jobs for each user!')
                     }
                 })
                 $('#submitButton').removeAttr("disabled");
