@@ -6,6 +6,7 @@
     },
     "instances": {
         "dev": "Dev",
-        "test": "Test"
+        "test": "Test",
+        "live": "Live"
     }
 }

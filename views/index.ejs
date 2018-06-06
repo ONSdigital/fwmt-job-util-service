@@ -163,6 +163,7 @@
                     if (data == 'Error') {
                         $('#dangeralert').css("display", "block")
                         $('#dangeralert').html('Totalmobile server details and/or authentication is incorrect.')
+                        $('#submitButton').removeAttr("disabled");
                     } else {
                         $('#successalert').css("display", "block")
                         // let allJobIds = ''
@@ -170,9 +171,9 @@
                         //     allJobIds = allJobIds + data[i] + '</br>'
                         // }
                         $('#successalert').html('Successfully created ' + numberOfJobs + ' jobs for each user!')
+                        $('#submitButton').removeAttr("disabled");
                     }
                 })
-                $('#submitButton').removeAttr("disabled");
             } else {
                 $('#dangeralert').css("display", "block")
                 $('#dangeralert').html('You have not completed some fields, please try again!')

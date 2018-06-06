@@ -156,9 +156,11 @@ let handler = {
 
                     let successfulIds = []
 
+                    let usercounter = 0
                     for (var c = 0; c < tmUNames.length; c++) {
                         tmUNames[c] = tmUNames[c].trim()
                         // addresses.addresses.forEach((address, i) => {
+                        let jobcounter = 0
                         for (let i = 0; i < numberOfJobs; i++) {
                             let createJobRequest = createJobRequestTemplate
                             let tmJobId = tmJobIdStub.replace(/%QUOTA%/g, leftPad(currentId, 5, 0))
@@ -215,20 +217,25 @@ let handler = {
                                         resolve('Error')
                                     })
                                 }
-                                if (i == numberOfJobs - 1 && c == tmUNames.length-1) {
-                                    await db.collection('idcounter').updateOne({
-                                        id: 'counter'
-                                    }, {
-                                        $set: {
-                                            counter: currentId
-                                        }
-                                    }, (err, doc) => {
-                                        if (err) throw err
-                                        console.log(successfulIds)
-                                        client.close();
-                                        resolve(successfulIds)
-                                    })
+                                if (jobcounter == numberOfJobs - 1) {
+                                    jobcounter = 0
+                                    usercounter++
+                                    if (usercounter == tmUNames.length) {
+                                        await db.collection('idcounter').updateOne({
+                                            id: 'counter'
+                                        }, {
+                                            $set: {
+                                                counter: currentId
+                                            }
+                                        }, (err, doc) => {
+                                            if (err) throw err
+                                            console.log(successfulIds)
+                                            client.close();
+                                            resolve(successfulIds)
+                                        })
+                                    }
                                 }
+                                jobcounter++;
                             });
                         }
                     }
