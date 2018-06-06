@@ -1,0 +1,13 @@
+{
+    "environments": {
+        "dev": "ons-dev.totalmobile-cloud.com",
+        "test": "ons-test.totalmobile-cloud.com",
+        "live": "ons-live.totalmobile-cloud.com",
+        "belfast": "ons.totalmobile.co.uk"
+    },
+    "instances": {
+        "dev": "Dev",
+        "test": "Test",
+        "live": "Live"
+    }
+}

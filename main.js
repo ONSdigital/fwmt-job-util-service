@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const handler = require('./message-handler.js')
+const config = require('./data/config.json')
 const app = express()
 
 app.use(bodyParser.urlencoded({
@@ -12,15 +13,15 @@ app.use(bodyParser.json())
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-    res.render('index')
+    res.render('index', config)
 })
 
 app.get('/reallocate', (req, res) => {
-    res.render('reallocations')
+    res.render('reallocations', config)
 })
 
 app.get('/delete', (req, res) => {
-    res.render('delete')
+    res.render('delete', config)
 })
 
 app.post('/', async (req, res) => {
@@ -35,6 +36,6 @@ app.post('/delete', async (req, res) => {
     res.send(await handler.deletions(req.body.tmJobIds, req.body.serverURL, req.body.instance, req.body.isSecure, req.body.authUsername, req.body.authPassword))
 })
 
-app.listen(3000, () => {
-    console.log('FWMT Message Sender Started on port 3000')
+app.listen(8080, () => {
+    console.log('FWMT Message Sender Started on port 8080')
 })
