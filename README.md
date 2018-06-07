@@ -10,8 +10,6 @@ The Debuggin'
 |  |____ |  |  |  | |  |      |  `--'  | |  |\  \----.|  | |  `--'  | |  |  |  | 
 |_______||__|  |__| | _|       \______/  | _| `._____||__|  \______/  |__|  |__|
                                                                             v2.0
-http://fwmt-gateway-job-utils.apps.devtest.onsclofo.uk/
-
 How to run locally -> 
     $ npm install
     $ npm start
